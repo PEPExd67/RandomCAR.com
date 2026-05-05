@@ -3,32 +3,25 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# Configuración de página
-st.set_page_config(page_title="RandomCAR.com", page_icon="🚗")
-
-# Cargar API Key (Localmente del .env, en la nube de 'Secrets')
+# 1. Cargar configuración
 load_dotenv()
 api_key = os.getenv("GOOGLE_API_KEY")
 
+# 2. Configurar IA
 if api_key:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-1.5-flash')
-
-    st.title("🚗 RandomCAR: Inteligencia Automotriz")
-    st.markdown("---")
-    
-    pregunta = st.text_input("Hazle una pregunta técnica al experto:")
-
-    if st.button("Consultar"):
-        if pregunta:
-            with st.spinner("Analizando componentes..."):
-                try:
-                    response = model.generate_content(f"Actúa como un experto mecánico profesional. Responde a: {pregunta}")
-                    st.success(response.text)
-                except Exception as e:
-                    st.error(f"Error de conexión: {e}")
 else:
-    st.error("Falta la configuración de la API Key.")
+    st.error("Falta la GOOGLE_API_KEY. Configúrala en Secrets o archivo .env")
 
-st.markdown("---")
-st.caption("© 2026 RandomCAR.com | Desarrollado por Pepe - Futuro Ingeniero en Sistemas")
+# 3. Interfaz
+st.title("🚗 RandomCAR.com")
+st.subheader("Inteligencia Automotriz by Pepe")
+
+pregunta = st.text_input("¿Qué duda tienes sobre tu auto?")
+
+if st.button("Consultar"):
+    if pregunta and api_key:
+        with st.spinner("Pensando..."):
+            response = model.generate_content(pregunta)
+            st.success(response.text)
